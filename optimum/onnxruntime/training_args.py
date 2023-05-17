@@ -62,13 +62,6 @@ class ORTTrainingArguments(TrainingArguments):
 
     optim: Optional[str] = field(default="adamw_hf", metadata={"help": "The optimizer to use."})
 
-    use_module_with_loss: Optional[bool] = field(
-        default=False,
-        metadata={
-            "help": "Use ModuleWithLoss Wrapper to compute loss inside the training loop, having this will help save memory for ORTModule Runs."
-        },
-    )
-
     # This method will not need to be overriden after the deprecation of `--adafactor` in version 5 of 🤗 Transformers.
     def __post_init__(self):
         # Handle --use_env option in torch.distributed.launch (local_rank not passed as an arg then).
@@ -340,10 +333,3 @@ class ORTTrainingArguments(TrainingArguments):
                 f"{self.hub_model_id}).",
                 FutureWarning,
             )
-        if self.use_module_with_loss is True:
-            logger.info(
-                "Using ModuleWithLoss Wrapper."
-                "loss will be computed during training loop and it will save memory peak "
-            )
-        else:
-            logger.info("Not Using ModuleWithLoss Wrapper.")

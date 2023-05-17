@@ -319,9 +319,7 @@ class ORTTrainer(Trainer):
         # _training_model will be wrapped so it will use ORT and will use the overriden functions in ModuleWithLoss.
         # _training_model will be storing the default version of the model and will unwrap it in case of eval/test.
 
-        # Only Wrap the model if we pass --use_module_with_loss flag.
-        if args.use_module_with_loss:
-            self._training_model = self.create_model_with_loss()
+        self._training_model = self.create_model_with_loss()
 
         self.model = model
 
@@ -331,7 +329,7 @@ class ORTTrainer(Trainer):
         if self.args.local_rank:
             torch.cuda.set_device(self.args.local_rank)
 
-    # this method will create a ModuleWithLoss Instance to use if you are passing --use_module_with_loss flag.
+    # this method will create a ModuleWithLoss Instance to use.
     # It will help reducing the peak memory usage by computing loss inside training.
     def create_model_with_loss(self):
         model_with_loss = ModuleWithLoss(self.model, self.args, self.label_smoother)
@@ -392,8 +390,7 @@ class ORTTrainer(Trainer):
                 "You need to install `onnxruntime-training` to use `ORTTrainer` for training. Check out "
                 "https://huggingface.co/docs/optimum/onnxruntime/usage_guides/trainer#install-onnx-runtime."
             )
-        if self.args.use_module_with_loss:
-            self.model = self._training_model
+        self.model = self._training_model
 
         if resume_from_checkpoint is False:
             resume_from_checkpoint = None
